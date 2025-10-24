@@ -26,9 +26,10 @@ export const signUp = async(req,res) => {
         res.cookie("token",token,{
             httpOnly:true,
             maxAge:7 * 24 * 60 * 60 * 1000,
-            sameSite: "strict",
-            secure:false
-        })
+            sameSite: "lax",
+            secure:false,
+            path: "/"
+        });
 
         return res.status(201).json(user)
     }
@@ -58,12 +59,14 @@ export const Login = async(req,res) => {
         
         const token = await genToken(user._id)
 
-        res.cookie("token",token,{
-            httpOnly:true,
-            maxAge:7*24*60*60*1000,
-            sameSite: "strict",
-            secure:false
-        })
+        res.cookie("token", token, {
+            httpOnly: true,
+            maxAge: 7 * 24 * 60 * 60 * 1000,
+            sameSite: "none",  // required for cross-site cookies
+            secure: true       // must be true with https
+          });
+          
+          
 
         return res.status(200).json(user)
     }
@@ -82,5 +85,26 @@ export const logOut = async(req,res) => {
 
     }
 }
+
+
+export const deleteUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await User.findByIdAndDelete(id);
+
+    // Clear the auth token cookie
+    res.clearCookie("token", {
+      httpOnly: true,
+      sameSite: "none",
+      secure: true   // use true in production with HTTPS
+    });
+
+    res.status(200).json({ message: "User deleted successfully and cookie cleared" });
+  } catch (error) {
+    res.status(500).json({ message: "Error deleting user", error });
+  }
+};
+
+
 
 

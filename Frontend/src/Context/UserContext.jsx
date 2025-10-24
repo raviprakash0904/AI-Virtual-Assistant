@@ -12,22 +12,36 @@ function UserContext({children}) {
   const[selectedImage,setSelectedImage]=useState(null)
 
   const handleCurrentUser = async()=>{
-    try{
-      const result = await axios.get(`${serverUrl}/api/user/current`,{withCredentials:true})
+    try {
+      const result = await axios.get(`${serverUrl}/api/user/current`, { withCredentials: true })
       setUserData(result.data)
-      console.log(result.data)
-
-    }catch(error){
-      console.log(error )
+      console.log("Current User =>", result.data)
+    } catch (error) {
+      console.log("Current user error:", error.response?.data || error.message)
+      setUserData(null)
+    } finally {
+      setLoading(false)   // ✅ ye add karna zaruri hai
     }
   }
+
+  const getGeminiResponse=async (command)=>{
+    try {
+      const result=await axios.post(`${serverUrl}/api/user/asktoassistant`,{command},{withCredentials:true})
+      return result.data
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+
+
 
   useEffect(()=>{
 handleCurrentUser() 
   },[])
   const value={
     serverUrl,userData,setUserData,loading,frontendImage,setFrontendImage,
-    backendImage,setBackendImage,selectedImage,setSelectedImage
+    backendImage,setBackendImage,selectedImage,setSelectedImage,getGeminiResponse
   }
   return (
     <div>

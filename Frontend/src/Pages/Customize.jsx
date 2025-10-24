@@ -10,6 +10,9 @@ import image7 from '../assets/image7.jpeg'
 import { LuImagePlus } from "react-icons/lu";
 import { userDataContext } from '../Context/UserContext'
 import { useNavigate } from 'react-router-dom'
+import { IoArrowBackOutline } from "react-icons/io5";
+import axios from "axios";
+
 
 
 function Customize() {
@@ -26,6 +29,25 @@ function Customize() {
     }
   return (
     <div className='w-full h-[100vh] bg-gradient-to-t from-[black] to-[#010158] flex justify-center items-center flex-col p-[20px]'>
+    <IoArrowBackOutline 
+    className='absolute top-[30px] left-[30px] cursor-pointer text-white w-[25px] h-[25px]'
+    onClick={async () => {
+      try {
+        if (userData?._id) {
+          await axios.delete(`${serverUrl}/api/auth/delete/${userData._id}`, {
+            withCredentials: true
+          });
+        }
+      setUserData(null);
+      navigate("/signup");
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      setUserData(null);
+      navigate("/signup");
+    }
+  }}
+/>
+
         <h1 className='text-white text-[30px] mb-[40px] text-center'>Select your <span className='text-blue-200'>Assistant Image</span></h1>
     <div className='w-full max-w-[900px] flex justify-center items-center flex-wrap gap-[15px] '>
     <Card image={image1}/>
